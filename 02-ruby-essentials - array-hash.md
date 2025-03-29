@@ -149,4 +149,18 @@ why does ruby have symbols?
 
 ## booleans
 
+an object that can be either `true` or `false` use for camparissions
+
+| operation             | syntax |
+| --------------------- | ------ |
+| equal                 | ==     |
+| less than             | <      |
+| greater thatn         | >      |
+| less than or equal to | <=     |
+| greater than or equal | >=     |
+| not                   | !      |
+| not equal             | !=     |
+| and                   | &&     |
+| or                    | |\|    |
+
 
