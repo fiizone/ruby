@@ -161,6 +161,24 @@ an object that can be either `true` or `false` use for camparissions
 | not                   | !      |
 | not equal             | !=     |
 | and                   | &&     |
-| or                    | |\|    |
+| or                    |        |
 
+```ruby
+x = 1
+x == 1 #true
+true.class #TrueClass
+x < 3 
+x > 0 && x < 100
+x >=100 || x <= 50
+!X #flase it tells us wether x has value or not
+[1,2,3].include?(2)
+x.nil?
+2.between?(1,5) #true
+[1,2,3].empty? #false
+[].empty? #true
 
+hash = {'a' => 1, 'b' => 2}
+hash.has_key?('a')
+```
+
+note that `?` in the end is a ruby convention that in the end of method name that return booleans
