@@ -171,3 +171,179 @@ max = limit || DEFAULT_LIMIT #here max becomes 100
 #this can be done as below
 limit = DEFAULT_LIMIT unless limit
 ```
+
+## loops
+
+- infinite loop:
+  
+  - ```ruby
+    loop do
+       #...
+    end
+    ```
+
+- control methods:
+  
+  - `break:` terminate the whole loop
+  
+  - `next:` jump to next loop
+  
+  - `redo:` redo this loop
+  
+  - `retry:` start the whole loop over
+
+- loops: example
+  
+  - a way of loops that is very rare to see:
+    
+    ```ruby
+    i = 5
+    loop do
+        break if i <= 0
+        puts "countdown: #{i}"
+        i -= 1
+    end
+    puts "blast off"
+    ```
+  
+  - more common to see `while, until`: while => as long as the boolean expression is `true`, the loop goes on till it sees `false`; until => it runs as long as the boolean expression evaluates to `false` so run until sth becomes `true`
+    
+    ```ruby
+    while boolean
+        #...
+    end
+    ##
+    i = 5
+    while i > 0
+        puts "countdown: #{i}"
+        i -= 1
+    end
+    puts "blast off"
+    ##
+    until boolean
+        #...
+    end
+    
+    i = 5
+    until i < 0
+        puts "countdown: #{i}"
+        i -= 1
+    end
+    puts "blast off"
+    ```
+
+## iterators:
+
+- to say or do again
+
+- to apply a procedure repeatedly
+
+- to perform code on each item in a set
+
+- example:
+  
+  - ```ruby
+    i = 5
+    i.times do
+        puts "countdown: #{i}"
+        i -= 1
+    end
+    puts "blast off"
+    ```
+
+### iterators types:
+
+- times
+  
+  - `5.times { puts "hello"}`
+
+- upto
+  
+  - `1.upto(5) {puts "hello"}`
+
+- downto
+  
+  - `5.downto(1) {puts "hello"}`
+
+- each
+  
+  - `(1..5).each {puts "hello"}`
+
+### iterators: block variables
+
+```ruby
+5.downto(1) do |i|
+    puts "countdown: #{i}"
+end
+puts "blast off"
+#we can use below but we are missing block variables there
+i = 5
+i.times do
+    puts "countdown #{i}"
+    i -= 1
+end
+puts "blast off"
+```
+
+### iterators: by class
+
+- integer: `times, upto, downto, step`
+
+- range: `each, step`
+
+- string: `each_line, each_char, each_byte`
+
+- array: `each, each_index, each_with_index`
+
+- hash: `each, each_key, each_value, each_pair`
+
+### iterators: for...in
+
+```ruby
+fruits = ['banana', 'apple', 'pear']
+fruits.each do |fruit|
+    puts fruit.capitalize
+end
+
+for fruit_fafa in fruits
+    puts fruit_fafa.capitalize
+end
+```
+
+## challenge
+
+- colors = "RRGGBBYYKK"
+
+- output 20 rows
+
+- on each row, shift the characters to the left by removing the first character and putting it at the end
+
+- "RGGBBYYKKR"
+
+- solutions:
+
+- ```ruby
+  #string version of script
+  colors = "RRGGBBYYKK"
+  lines = 20
+  lines.times do |i|
+      first = colors[0]
+      rest = colors[1..-1]
+      colors = rest + first
+      puts colors
+  end
+  
+  #array version of the script
+  colors = "RRGGBBYYKK"
+  use split to work with array instead of string
+  color_array = colors.split('')
+  #puts color_array.class
+  #puts color_array[6]
+  #puts color_array.shift()
+  lines = 20
+  1.upto(lines) do |i|
+      first_char = color_array.shift()
+      color_array << first_char
+      puts color_array.join
+  end
+  ```
