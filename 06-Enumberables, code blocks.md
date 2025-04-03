@@ -227,5 +227,3 @@ end
         memo << fruit[0]
     end
     ```
-
-
