@@ -1,0 +1,5 @@
+{
+    "ERR001": "Database connection failed",
+    "ERR002": "Invalid user input",
+    "ERR003": "Timeout while processing request"
+  }
