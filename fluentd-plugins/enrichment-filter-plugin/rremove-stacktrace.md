@@ -1,12 +1,18 @@
+we have a sample log like this:
+
+```json
 2025-04-21 13:57:21.792938155 -0400 kubernetes.logs: {"ts":1738557840904.059,"logger":"UnhandledError","caller":"resourcequota/resource_quota_controller.go:446","msg":"Unhandled Error","err":"unable to retrieve the complete list of server APIs: metrics.k8s.io/v1beta1: stale GroupVersion discovery: metrics.k8s.io/v1beta1","error_code":"ERR001","test_key":"11","log_uuid":"3d003fb9-0e7c-4d88-ac90-77080ec7d77f","extracted_stack_trace":"value-stack"}
+```
+
+we want to achieve this:
+
+```json
 2025-04-21 13:57:21.792938155 -0400 kubernetes.logs: {"ts":1738557840904.059,"logger":"UnhandledError","caller":"resourcequota/resource_quota_controller.go:446","msg":"Unhandled Error","err":"unable to retrieve the complete list of server APIs: metrics.k8s.io/v1beta1: stale GroupVersion discovery: metrics.k8s.io/v1beta1","error_code":"ERR001","test_key":"11","log_uuid":"3d003fb9-0e7c-4d88-ac90-77080ec7d77f"}
+```
 
+our fluentd config looks like something like this:
 
-
-
-
-
-config
+```yaml
 <source>
   @type tail
   path /var/log/res/aaaa.log
@@ -21,7 +27,6 @@ config
     </parse>
   </parse>
 </source>
-
 <filter kubernetes.logs>
   @type record_transformer
   enable_ruby true
@@ -29,7 +34,6 @@ config
     log_uuid ${record["stack_trace"] ? (require 'securerandom'; SecureRandom.uuid) : nil}
   </record>
 </filter>
-
 <match kubernetes.logs>
   @type copy
   <store>
@@ -41,7 +45,6 @@ config
     @label @main_log
   </store>
 </match>
-
 <label @stack_trace>
   <filter kubernetes.logs>
     @type grep
@@ -59,21 +62,18 @@ config
     </record>
     remove_keys stack_trace
   </filter>
-
-  <match kubernetes.logs>
+<match kubernetes.logs>
     @type stdout
   </match>
 </label>
-
-
 <label @main_log>
   <filter kubernetes.logs>
     @type record_transformer
     enable_ruby true
     remove_keys stack_trace
   </filter>
-
-  <match kubernetes.logs>
+<match kubernetes.logs>
     @type stdout
   </match>
 </label>
+```
