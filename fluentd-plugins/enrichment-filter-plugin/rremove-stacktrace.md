@@ -1,3 +1,7 @@
+# removing stack trace
+
+**our goal is to remove an stack trace from logs and put an uuid in amin log so that we can then correlate two logs with each other**
+
 we have a sample log like this:
 
 ```json
@@ -18,7 +22,7 @@ we want to achieve these output:
 2025-04-23 02:34:29.725366399 -0400 kubernetes.logs: {"ts":1738557840904.059,"logger":"UnhandledError","caller":"resourcequota/resource_quota_controller.go:446","msg":"Unhandled Error","err":"unable to retrieve the complete list of server APIs: metrics.k8s.io/v1beta1: stale GroupVersion discovery: metrics.k8s.io/v1beta1","error_code":"ERR001","test_key":"11","log_uuid":"f21ca1e1-67dc-4546-8a36-1066b72f49ca","extracted_stack_trace":"value-stack-trace"}
 ```
 
-
+## doing the job with `grep` plugin of fluentd
 
 our fluentd config looks like something like this:
 
@@ -83,6 +87,71 @@ our fluentd config looks like something like this:
     remove_keys stack_trace
   </filter>
 <match kubernetes.logs>
+    @type stdout
+  </match>
+</label>
+```
+
+## doing job with `record_transformer` plugin of fluentd
+
+```yaml
+<source>
+  @type tail
+  path /var/log/res/aaaa.log
+  pos_file /var/log/fluentd/cursor/k8s-1-prom.log.pos
+  tag kubernetes.logs
+  read_from_head true
+  <parse>
+    @type cri
+    merge_cri_fields false
+    <parse>
+      @type json
+    </parse>
+  </parse>
+</source>
+
+<filter kubernetes.logs>
+  @type record_transformer
+  enable_ruby true
+  <record>
+    log_uuid ${record["stack_trace"] && !record["stack_trace"].empty? ? SecureRandom.uuid : record["log_uuid"]}
+  </record>
+</filter>
+
+<match kubernetes.logs>
+  @type copy
+  <store>
+    @type relabel
+    @label @stack_trace
+  </store>
+  <store>
+    @type relabel
+    @label @main_log
+  </store>
+</match>
+<label @stack_trace>
+  <filter kubernetes.logs>
+    @type record_transformer
+    enable_ruby true
+    <record>
+      extracted_stack_trace ${record["stack_trace"] && !record["stack_trace"].empty? ? record["stack_trace"] : nil}
+    </record>
+    remove_keys stack_trace
+  </filter>
+
+  <match kubernetes.logs>
+    @type stdout
+  </match>
+</label>
+
+<label @main_log>
+  <filter kubernetes.logs>
+    @type record_transformer
+    enable_ruby true
+    remove_keys stack_trace
+  </filter>
+
+  <match kubernetes.logs>
     @type stdout
   </match>
 </label>
